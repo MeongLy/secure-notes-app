@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Notes App - {% block title %}Catatan Aman{% endblock %}</title>
+
+  <!-- Prevent caching of authenticated pages -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    .session-timer-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background-color: #28a745;
+      z-index: 9999;
+      transition: width 1s linear;
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+  {% if current_user.is_authenticated %}
+  <!-- Session Timer Bar -->
+  <div id="sessionTimerBar" class="session-timer-bar" style="width: 0%;"></div>
+
+  <script>
+    // Session timeout dalam detik (15 menit = 900 detik)
+    var sessionTimeoutSeconds = {{ config.PERMANENT_SESSION_LIFETIME|default(900) }};
+    var remainingSeconds = sessionTimeoutSeconds;
+    var timerInterval = null;
+    var isLoggingOut = false;
+
+    function updateTimerBar() {
+        var percentage = (remainingSeconds / sessionTimeoutSeconds) * 100;
+        var bar = document.getElementById('sessionTimerBar');
+        if (bar) {
+            bar.style.width = percentage + '%';
+            if (percentage < 20) {
+                bar.style.backgroundColor = '#dc3545';
+            } else if (percentage < 50) {
+                bar.style.backgroundColor = '#fd7e14';
+            } else {
+                bar.style.backgroundColor = '#28a745';
+            }
+        }
+    }
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(function() {
+            if (remainingSeconds > 0 && !isLoggingOut) {
+                remainingSeconds--;
+                updateTimerBar();
+                if (remainingSeconds <= 0) {
+                    isLoggingOut = true;
+                    clearInterval(timerInterval);
+                    window.location.href = "{{ url_for('auth.logout') }}";
+                }
+            }
+        }, 1000);
+    }
+
+    function resetTimer() {
+        if (isLoggingOut) return;
+        remainingSeconds = sessionTimeoutSeconds;
+        updateTimerBar();
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            startTimer();
+        }
+    }
+
+    var activityTimer = null;
+    var events = ['click', 'keypress', 'mousemove', 'scroll', 'touchstart'];
+    for (var i = 0; i < events.length; i++) {
+        document.addEventListener(events[i], function() {
+            if (activityTimer) clearTimeout(activityTimer);
+            activityTimer = setTimeout(resetTimer, 500);
+        });
+    }
+
+    updateTimerBar();
+    startTimer();
+  </script>
+
+  <!-- Prevent back button after logout -->
+  <script>
+    {% if not current_user.is_authenticated %}
+    history.pushState(null, null, location.href);
+    window.onpopstate = function() {
+        window.location.replace("{{ url_for('auth.login') }}");
+    };
+    {% endif %}
+  </script>
+  {% endif %}
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">
+        <i class="fas fa-lock"></i> Secure Notes
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          {% if current_user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('notes.dashboard') }}">
+              <i class="fas fa-home"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('notes.create_note') }}">
+              <i class="fas fa-plus-circle"></i> Catatan Baru
+            </a>
+          </li>
+          {% if current_user.is_admin() %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-shield-alt"></i> Admin
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">
+                  <i class="fas fa-chart-line"></i> Dashboard Admin
+                </a></li>
+              <li><a class="dropdown-item" href="{{ url_for('admin.list_users') }}">
+                  <i class="fas fa-users"></i> Kelola User
+                </a></li>
+              <li><a class="dropdown-item" href="{{ url_for('admin.view_logs') }}">
+                  <i class="fas fa-history"></i> Security Logs
+                </a></li>
+            </ul>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <span class="nav-link text-info">
+              <i class="fas fa-user-circle"></i> {{ current_user.username }}
+              {% if current_user.is_admin() %}
+              <span class="badge bg-danger ms-1">Admin</span>
+              {% endif %}
+            </span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.login') }}">
+              <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.register') }}">
+              <i class="fas fa-user-plus"></i> Register
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  <div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show shadow-sm"
+      role="alert">
+      <i class="fas fa-info-circle me-2"></i> {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Content -->
+  <main class="container my-4">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-3 mt-5">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-between align-items-center">
+        <span class="security-badge">
+          <i class="fas fa-shield-alt me-1"></i> bcrypt | RBAC | Session Timeout | Input Validation
+        </span>
+        <small>&copy; 2025 Secure Notes App - SSE Project</small>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

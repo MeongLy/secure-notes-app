@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Buat Catatan Baru{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-gradient-primary text-white text-center py-3" style="background: linear-gradient(135deg, #2c7da0, #1f5068);">
+                <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i> Buat Catatan Baru</h4>
+                <small>Catatan Anda akan tersimpan dengan aman</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('notes.create_note') }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-semibold">
+                            <i class="fas fa-heading me-1 text-primary"></i> Judul
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="title" name="title"
+                               placeholder="Masukkan judul catatan" required autofocus>
+                        <div class="form-text small">Maksimal 200 karakter.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="content" class="form-label fw-semibold">
+                            <i class="fas fa-file-alt me-1 text-primary"></i> Isi Catatan
+                        </label>
+                        <textarea class="form-control" id="content" name="content" rows="12"
+                                  placeholder="Tulis catatan Anda di sini..."></textarea>
+                        <div class="form-text small">Maksimal 10.000 karakter. Anda bisa menggunakan format teks biasa.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between gap-2">
+                        <a href="{{ url_for('notes.dashboard') }}" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-arrow-left me-1"></i> Batal
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save me-1"></i> Simpan Catatan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tips Keamanan -->
+        <div class="alert alert-info mt-3 small">
+            <i class="fas fa-shield-alt me-2"></i>
+            <strong>Tips Keamanan:</strong> Catatan Anda dienkripsi dan hanya bisa diakses oleh Anda. Admin tidak dapat membaca isi catatan pribadi Anda.
+        </div>
+    </div>
+</div>
+
+<script>
+    // Character counter for title
+    const titleInput = document.getElementById('title');
+    const titleHelp = titleInput?.parentElement?.querySelector('.form-text');
+    if (titleInput && titleHelp) {
+        titleInput.addEventListener('input', function() {
+            const remaining = 200 - this.value.length;
+            titleHelp.textContent = `Maksimal 200 karakter. Tersisa ${remaining} karakter.`;
+        });
+    }
+</script>
+{% endblock %}

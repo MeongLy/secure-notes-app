@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola User - Admin Panel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2c7da0, #1f5068);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .stat-card {
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .table-user-row {
+        transition: background-color 0.2s;
+    }
+    .table-user-row:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <div>
+            <h1 class="mb-1">
+                <i class="fas fa-users text-primary me-2"></i> Kelola User
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin Panel</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Kelola User</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary" onclick="window.location.reload()">
+                <i class="fas fa-sync-alt me-1"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards - Menggunakan variabel dari backend -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Users</h6>
+                            <h2 class="mb-0">{{ users|length }}</h2>
+                        </div>
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                            <i class="fas fa-users fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Admin Users</h6>
+                            <h2 class="mb-0">{{ admin_count }}</h2>
+                        </div>
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3">
+                            <i class="fas fa-shield-alt fa-2x text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Regular Users</h6>
+                            <h2 class="mb-0">{{ user_count }}</h2>
+                        </div>
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                            <i class="fas fa-user fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Notes</h6>
+                            <h2 class="mb-0">{{ total_notes }}</h2>
+                        </div>
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                            <i class="fas fa-file-alt fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Cari username, email, atau role...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="roleFilter" class="form-select">
+                        <option value="all">Semua Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button class="btn btn-outline-secondary" onclick="resetFilters()">
+                        <i class="fas fa-undo-alt me-1"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i> Daftar User</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="userTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 60px">#</th>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Catatan</th>
+                            <th>Terdaftar</th>
+                            <th>Last Login</th>
+                            <th style="width: 100px">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class="table-user-row" data-username="{{ user.username|lower }}" data-email="{{ user.email|lower }}" data-role="{{ user.role }}">
+                            <td>
+                                <div class="user-avatar">
+                                    {{ user.username[0]|upper }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold">{{ user.username }}</div>
+                                {% if user.id == current_user.id %}
+                                    <span class="badge bg-info">Anda</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.is_admin() %}
+                                    <span class="badge bg-danger px-3 py-2">
+                                        <i class="fas fa-shield-alt me-1"></i> Admin
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary px-3 py-2">
+                                        <i class="fas fa-user me-1"></i> User
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-info rounded-pill">{{ user.notes|length }}</span>
+                            </td>
+                            <td>
+                                <small>{{ user.created_at.strftime('%d/%m/%Y') }}</small>
+                                <br>
+                                <small class="text-muted">{{ user.created_at.strftime('%H:%M') }}</small>
+                            </td>
+                            <td>
+                                {% if user.last_login %}
+                                    <small>{{ user.last_login.strftime('%d/%m/%Y %H:%M') }}</small>
+                                {% else %}
+                                    <span class="text-muted"><i class="fas fa-minus-circle"></i> Belum pernah</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('admin.view_user', user_id=user.id) }}" class="btn btn-outline-info" title="Detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if user.id != current_user.id %}
+                                    <button type="button" class="btn btn-outline-danger" title="Hapus"
+                                            data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i> Menampilkan <span id="visibleCount">{{ users|length }}</span> dari {{ users|length }} user
+                </small>
+                <small class="text-muted">
+                    <i class="fas fa-shield-alt me-1"></i> Role-based access control (RBAC) aktif
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modals -->
+{% for user in users %}
+{% if user.id != current_user.id %}
+<div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Hapus User
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus user:</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-user me-2"></i>
+                    <strong>{{ user.username }}</strong> ({{ user.email }})
+                </div>
+                <div class="alert alert-danger small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Peringatan:</strong> Tindakan ini akan menghapus user beserta
+                    <strong>{{ user.notes|length }} catatan</strong> yang dimilikinya. Tindakan ini tidak dapat dibatalkan.
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="confirmDelete{{ user.id }}">
+                    <label class="form-check-label small" for="confirmDelete{{ user.id }}">
+                        Saya mengerti dan ingin menghapus user ini secara permanen
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Batal
+                </button>
+                <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}">
+                    <button type="submit" class="btn btn-danger" id="deleteBtn{{ user.id }}" disabled>
+                        <i class="fas fa-trash me-1"></i> Ya, Hapus User
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+<script>
+// Search and filter functionality
+const searchInput = document.getElementById('searchInput');
+const roleFilter = document.getElementById('roleFilter');
+const tableRows = document.querySelectorAll('#userTable tbody tr');
+const visibleCountSpan = document.getElementById('visibleCount');
+
+function filterTable() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const roleValue = roleFilter.value;
+    let visibleCount = 0;
+
+    tableRows.forEach(row => {
+        const username = row.getAttribute('data-username');
+        const email = row.getAttribute('data-email');
+        const role = row.getAttribute('data-role');
+
+        const matchesSearch = !searchTerm || username.includes(searchTerm) || email.includes(searchTerm);
+        const matchesRole = roleValue === 'all' || role === roleValue;
+
+        if (matchesSearch && matchesRole) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    visibleCountSpan.textContent = visibleCount;
+}
+
+searchInput.addEventListener('input', filterTable);
+roleFilter.addEventListener('change', filterTable);
+
+function resetFilters() {
+    searchInput.value = '';
+    roleFilter.value = 'all';
+    filterTable();
+}
+
+// Enable delete buttons when checkbox is checked
+{% for user in users %}
+{% if user.id != current_user.id %}
+(function() {
+    const checkbox = document.getElementById('confirmDelete{{ user.id }}');
+    const deleteBtn = document.getElementById('deleteBtn{{ user.id }}');
+    if (checkbox && deleteBtn) {
+        checkbox.addEventListener('change', function() {
+            deleteBtn.disabled = !this.checked;
+        });
+    }
+})();
+{% endif %}
+{% endfor %}
+</script>
+{% endblock %}

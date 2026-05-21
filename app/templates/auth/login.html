@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Secure Notes{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0"><i class="fas fa-sign-in-alt"></i> Login</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('auth.login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user"></i> Username atau Email
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               required autofocus>
+                        <div class="form-text">Masukkan username atau email yang terdaftar.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-key"></i> Password
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <small>
+                    Belum punya akun? <a href="{{ url_for('auth.register') }}">Daftar di sini</a>
+                </small><br>
+                <small class="text-muted">
+                    <i class="fas fa-shield-alt"></i> Proteksi: bcrypt | Rate Limit (5x) | Session Timeout (15 menit)
+                </small>
+            </div>
+        </div>
+
+        <!-- Demo Credentials -->
+        <div class="card mt-3 bg-light">
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-info-circle"></i> Demo Akun:</h6>
+                <p class="mb-1"><strong>Admin:</strong> admin / admin123</p>
+                <p class="mb-0"><strong>User:</strong> user1 / user123 (daftar dulu)</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

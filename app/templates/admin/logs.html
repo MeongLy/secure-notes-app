@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+
+{% block title %}Security Logs - Admin Panel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .log-container {
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        border-radius: 12px;
+        padding: 0;
+        overflow: hidden;
+    }
+    .log-header {
+        background-color: #2d2d2d;
+        padding: 12px 16px;
+        border-bottom: 1px solid #3d3d3d;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .log-header h6 {
+        margin: 0;
+        color: #fff;
+    }
+    .log-content {
+        max-height: 500px;
+        overflow-y: auto;
+        padding: 16px;
+    }
+    .log-line {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        padding: 4px 8px;
+        margin: 0;
+        border-bottom: 1px solid #2d2d2d;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    .log-line:hover {
+        background-color: #2a2d3e;
+    }
+    .log-info {
+        color: #4ec9b0;
+    }
+    .log-warning {
+        color: #dcdcaa;
+    }
+    .log-error {
+        color: #f48771;
+    }
+    .log-success {
+        color: #6a9955;
+    }
+    .badge-log {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+    .log-stats {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 12px 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <div>
+            <h1 class="mb-1">
+                <i class="fas fa-history text-primary me-2"></i> Security Logs
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin Panel</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Security Logs</li>
+                </ol>
+            </nav>
+            <p class="text-muted mt-2 mb-0">
+                <i class="fas fa-info-circle me-1"></i>
+                Mencatat semua aktivitas keamanan: login, logout, akses tidak sah, dan tindakan admin
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary me-2" onclick="refreshLogs()">
+                <i class="fas fa-sync-alt me-1"></i> Refresh
+            </button>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#clearLogsModal">
+                <i class="fas fa-trash-alt me-1"></i> Clear Logs
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Logs</h6>
+                            <h3 class="mb-0">{{ logs|length }}</h3>
+                        </div>
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                            <i class="fas fa-database fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Limit Display</h6>
+                            <form method="GET" class="d-inline">
+                                <select name="limit" onchange="this.form.submit()" class="form-select form-select-sm w-auto">
+                                    <option value="50" {% if limit==50 %}selected{% endif %}>50</option>
+                                    <option value="100" {% if limit==100 %}selected{% endif %}>100</option>
+                                    <option value="200" {% if limit==200 %}selected{% endif %}>200</option>
+                                    <option value="500" {% if limit==500 %}selected{% endif %}>500</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                            <i class="fas fa-list fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Log File</h6>
+                            <h6 class="mb-0">security.log</h6>
+                        </div>
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                            <i class="fas fa-file-alt fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Log Retention</h6>
+                            <h6 class="mb-0">Manual Clear</h6>
+                        </div>
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3">
+                            <i class="fas fa-clock fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Viewer -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="mb-0">
+                    <i class="fas fa-terminal me-2"></i> Security Log Viewer
+                </h5>
+                <div class="d-flex gap-2">
+                    <div class="input-group" style="width: 200px;">
+                        <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                        <input type="text" id="logSearch" class="form-control form-control-sm" placeholder="Filter logs...">
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-secondary" onclick="copyLogs()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="downloadLogs()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="log-container">
+                <div class="log-header">
+                    <h6><i class="fas fa-shield-alt me-2"></i> Security Event Log</h6>
+                    <small class="text-muted">{{ logs|length }} entries</small>
+                </div>
+                <div class="log-content" id="logContent">
+                    {% if logs %}
+                        {% for log in logs %}
+                            <div class="log-line">
+                                {{ log }}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle fa-4x text-success mb-3 d-block"></i>
+                            <h5>Tidak Ada Log</h5>
+                            <p class="text-muted">Belum ada aktivitas keamanan yang tercatat.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Logs disimpan di: <code>logs/security.log</code>
+                </small>
+                <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>
+                    Waktu dalam format: YYYY-MM-DD HH:MM:SS
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Legend -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+            <h6 class="mb-3"><i class="fas fa-tag me-2"></i> Event Types Legend</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <span class="badge bg-success badge-log me-1">LOGIN_SUCCESS</span>
+                    <span class="small">Login berhasil</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-danger badge-log me-1">LOGIN_FAILED</span>
+                    <span class="small">Login gagal</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-info badge-log me-1">LOGOUT</span>
+                    <span class="small">Logout</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-warning badge-log me-1">NOTE_CREATED</span>
+                    <span class="small">Catatan dibuat</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-warning badge-log me-1">NOTE_EDITED</span>
+                    <span class="small">Catatan diedit</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-warning badge-log me-1">NOTE_DELETED</span>
+                    <span class="small">Catatan dihapus</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-danger badge-log me-1">UNAUTHORIZED_ACCESS</span>
+                    <span class="small">Akses tidak sah</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-primary badge-log me-1">ADMIN_ACTION</span>
+                    <span class="small">Tindakan admin</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clear Logs Confirmation Modal -->
+<div class="modal fade" id="clearLogsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Hapus Semua Log
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus semua security logs?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Peringatan:</strong> Tindakan ini tidak dapat dibatalkan. Semua catatan log keamanan akan hilang permanen.
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="confirmClearLogs">
+                    <label class="form-check-label" for="confirmClearLogs">
+                        Saya mengerti dan ingin menghapus semua log
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Batal
+                </button>
+                <form method="POST" action="{{ url_for('admin.clear_logs') }}">
+                    <button type="submit" class="btn btn-danger" id="clearLogsBtn" disabled>
+                        <i class="fas fa-trash-alt me-1"></i> Ya, Hapus Semua Log
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Filter logs functionality
+const searchInput = document.getElementById('logSearch');
+const logLines = document.querySelectorAll('.log-line');
+
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        let visibleCount = 0;
+
+        logLines.forEach(line => {
+            const text = line.textContent.toLowerCase();
+            if (searchTerm === '' || text.includes(searchTerm)) {
+                line.style.display = '';
+                visibleCount++;
+            } else {
+                line.style.display = 'none';
+            }
+        });
+
+        // Update header info
+        const headerInfo = document.querySelector('.log-header small');
+        if (headerInfo) {
+            headerInfo.textContent = visibleCount + ' entries visible';
+        }
+    });
+}
+
+// Copy logs to clipboard
+function copyLogs() {
+    let logText = '';
+    const visibleLogs = document.querySelectorAll('.log-line[style="display: none;"]');
+    const allLogs = document.querySelectorAll('.log-line');
+
+    for (let i = 0; i < allLogs.length; i++) {
+        if (allLogs[i].style.display !== 'none') {
+            logText += allLogs[i].textContent + '\n';
+        }
+    }
+
+    navigator.clipboard.writeText(logText).then(function() {
+        showToast('Logs copied to clipboard!', 'success');
+    }).catch(function() {
+        showToast('Failed to copy logs', 'error');
+    });
+}
+
+// Download logs as file
+function downloadLogs() {
+    let logText = '';
+    const visibleLogs = document.querySelectorAll('.log-line');
+
+    for (let i = 0; i < visibleLogs.length; i++) {
+        if (visibleLogs[i].style.display !== 'none') {
+            logText += visibleLogs[i].textContent + '\n';
+        }
+    }
+
+    const blob = new Blob([logText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'security_logs_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('Logs downloaded!', 'success');
+}
+
+// Refresh logs
+function refreshLogs() {
+    window.location.reload();
+}
+
+// Show toast notification
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = 'toast position-fixed bottom-0 end-0 m-3';
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="toast-header bg-${type === 'success' ? 'success' : 'danger'} text-white">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+    document.body.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
+    bsToast.show();
+    toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
+    });
+}
+
+// Enable clear logs button when checkbox is checked
+const confirmCheckbox = document.getElementById('confirmClearLogs');
+const clearBtn = document.getElementById('clearLogsBtn');
+if (confirmCheckbox && clearBtn) {
+    confirmCheckbox.addEventListener('change', function() {
+        clearBtn.disabled = !this.checked;
+    });
+}
+
+// Auto refresh setiap 30 detik (opsional)
+// setInterval(function() {
+//     if (!document.hidden) {
+//         refreshLogs();
+//     }
+// }, 30000);
+</script>
+{% endblock %}

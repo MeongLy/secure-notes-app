@@ -1,0 +1,173 @@
+/* Secure Notes App - Custom CSS */
+:root {
+  --primary: #2c7da0;
+  --primary-dark: #1f5068;
+  --secondary: #61a5c2;
+  --success: #2e8b57;
+  --danger: #c94f4f;
+  --warning: #e9b35f;
+  --info: #3b82f6;
+  --light: #f8f9fa;
+  --dark: #343a40;
+  --gray: #6c757d;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* Navbar */
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.navbar-brand i {
+  margin-right: 8px;
+}
+
+/* Card styling */
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  background-color: white;
+  border-bottom: 1px solid #e9ecef;
+  font-weight: 600;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+/* Notes card */
+.note-card {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.note-card:hover {
+  transform: translateY(-4px);
+}
+
+.note-card .card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-content-preview {
+  font-size: 0.9rem;
+  color: #495057;
+  line-height: 1.4;
+  max-height: 4.2em;
+  overflow: hidden;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 40px;
+  padding: 6px 18px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-sm {
+  border-radius: 30px;
+  padding: 4px 12px;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* Forms */
+.form-control, .form-select {
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  padding: 10px 16px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(44,125,160,0.1);
+}
+
+/* Alert */
+.alert {
+  border-radius: 12px;
+  border: none;
+}
+
+/* Footer */
+footer {
+  background-color: white;
+  border-top: 1px solid #e9ecef;
+  margin-top: auto;
+}
+
+/* Security badge */
+.security-badge {
+  background-color: #e9ecef;
+  padding: 4px 12px;
+  border-radius: 40px;
+  font-size: 0.75rem;
+  color: #495057;
+}
+
+/* Admin panel stats */
+.stat-card {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 20px;
+}
+
+.stat-card h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+/* Table */
+.table {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: none;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+  .card-title {
+    font-size: 1rem;
+  }
+}

@@ -175,7 +175,7 @@ secure-notes-app/
 ## 1. Clone Repository
 
 ```bash
-git clone https://github.com/username/secure-notes-app.git
+git clone https://github.com/MeongLy/secure-notes-app.git
 cd secure-notes-app
 ```
 

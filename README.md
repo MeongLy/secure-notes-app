@@ -10,15 +10,15 @@ Aplikasi web untuk menyimpan, mengelola, dan melindungi catatan pribadi pengguna
 |---|---|
 | **Tema Project** | Secure Notes App - Aplikasi Catatan Aman |
 | **Mata Kuliah** | Secure Software Engineering (SSE) |
+| **Dosen** | Septian Geges,S.Kom., M.Kom  |
 
 ## Anggota Kelompok
 
 | No | Nama | NIM |
 |---|---|---|
-| 1 | [Nama Anggota 1] | [NIM] |
-| 2 | [Nama Anggota 2] | [NIM] |
-| 3 | [Nama Anggota 3] | [NIM] |
-| 4 | [Nama Anggota 4] | [NIM] |
+| 1 | [Ariel Ebenia Ezeria 1] | [213030503140] |
+| 2 | [Rangga Imanuel 2] | [203030503091] |
+| 2 | [Rusma Watie WN 2] | [213030503139] |
 
 ---
 

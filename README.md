@@ -1,5 +1,7 @@
 # 🔐 Secure Notes App
 
+HARAP GUNAKAN YANG SUDAH DI DEVELOP
+
 Aplikasi web untuk menyimpan, mengelola, dan melindungi catatan pribadi pengguna secara aman. Dibangun dengan pendekatan **Secure Software Engineering (SSE)** yang menekankan aspek keamanan sejak tahap perancangan.
 
 ---

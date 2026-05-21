@@ -16,9 +16,9 @@ Aplikasi web untuk menyimpan, mengelola, dan melindungi catatan pribadi pengguna
 
 | No | Nama | NIM |
 |---|---|---|
-| 1 | [Ariel Ebenia Ezeria 1] | [213030503140] |
-| 2 | [Rangga Imanuel 2] | [203030503091] |
-| 2 | [Rusma Watie WN 2] | [213030503139] |
+| 1 | [Ariel Ebenia Ezeria ] | [213030503140] |
+| 2 | [Rangga Imanuel ] | [203030503091] |
+| 2 | [Rusma Watie WN ] | [213030503139] |
 
 ---
 

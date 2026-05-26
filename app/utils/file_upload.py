@@ -130,7 +130,6 @@ def generate_secure_filename(original_filename):
         ext = f".{ext}" if ext else ""
 
     # hash_part = hashlib.md5(f"{timestamp}{name}".encode()).hexdigest()[:8]
-
     hash_part = hashlib.blake2b(
         f"{timestamp}{name}".encode(), digest_size=8
     ).hexdigest()

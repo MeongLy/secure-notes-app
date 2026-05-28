@@ -257,10 +257,10 @@ logs/
 
 | Minggu | Status |
 |---|---|
-| Minggu 1 — Threat Modeling | 🔄 In Progress |
-| Minggu 2 — Secure Coding | ⏳ Pending |
-| Minggu 3 — Security Testing | ⏳ Pending |
-| Minggu 4 — Hardening | ⏳ Pending |
+| Minggu 1 — Threat Modeling | ✅ Done |
+| Minggu 2 — Secure Coding | ✅ Done |
+| Minggu 3 — Security Testing | ✅ Done |
+| Minggu 4 — Hardening | ✅ Done |
 
 ---
 

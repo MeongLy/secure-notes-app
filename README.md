@@ -264,6 +264,45 @@ logs/
 
 ---
 
+# 🔐 Secure Notes App
+
+Aplikasi catatan pribadi berbasis web yang menerapkan prinsip **Secure Software Engineering (SSE)** dengan berbagai kontrol keamanan.
+
+---
+
+## 📋 Deskripsi Proyek
+
+Secure Notes App adalah aplikasi web untuk menyimpan dan mengelola catatan pribadi secara aman. Aplikasi ini dibangun menggunakan **Flask (Python)** dengan database **SQLite** dan menerapkan berbagai kontrol keamanan sesuai standar OWASP.
+
+### Fitur Utama
+- Registrasi dan Login pengguna
+- CRUD catatan pribadi
+- Panel Admin (kelola user, lihat log keamanan)
+- Upload file attachment
+
+### Kontrol Keamanan
+- ✅ Password hashing (pbkdf2:sha256)
+- ✅ Rate limiting (5 percobaan login)
+- ✅ Account lock (15 menit)
+- ✅ Session timeout (15 menit)
+- ✅ CSRF protection pada semua form
+- ✅ Security headers (X-Frame-Options, X-Content-Type-Options)
+- ✅ Input validation dan sanitasi (XSS prevention)
+- ✅ SQL Injection prevention (SQLAlchemy ORM)
+- ✅ IDOR prevention (ownership validation)
+- ✅ Security logging
+- ✅ Dependency audit (pip-audit)
+
+---
+
+## 🚀 Cara Install
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/MeongLy/secure-notes-app.git
+cd secure-notes-app
+
+
 # 📄 License
 
 Project ini dibuat untuk keperluan akademik mata kuliah Secure Software Engineering (SSE).

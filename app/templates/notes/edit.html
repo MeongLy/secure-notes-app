@@ -13,6 +13,9 @@
       </div>
       <div class="card-body p-4">
         <form method="POST" action="{{ url_for('notes.edit_note', note_id=note.id) }}">
+          <!-- ✅ CSRF TOKEN -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
           <div class="mb-3">
             <label for="title" class="form-label fw-semibold">
               <i class="fas fa-heading me-1 text-warning"></i> Judul
@@ -41,7 +44,6 @@
         </form>
       </div>
     </div>
-    <!-- Tambahkan di notes/edit.html, setelah form edit catatan -->
 
     <!-- File Attachments Section -->
     <div class="card mt-4">
@@ -52,6 +54,8 @@
         <!-- Upload Form -->
         <form method="POST" action="{{ url_for('notes.upload_attachment', note_id=note.id) }}"
           enctype="multipart/form-data" class="mb-3">
+          <!-- ✅ CSRF TOKEN untuk upload file -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="input-group">
             <input type="file" class="form-control" name="file" accept=".png,.jpg,.jpeg,.gif,.pdf,.txt,.doc,.docx,.xlsx"
               required>
@@ -84,6 +88,8 @@
               </a>
               <form method="POST" action="{{ url_for('notes.delete_attachment', attachment_id=att.id) }}"
                 class="d-inline">
+                <!-- ✅ CSRF TOKEN untuk delete attachment -->
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus file ini?')">
                   <i class="fas fa-trash"></i>
                 </button>
@@ -97,6 +103,7 @@
         {% endif %}
       </div>
     </div>
+
     <!-- Informasi Tambahan -->
     <div class="card mt-3 bg-light">
       <div class="card-body py-2">

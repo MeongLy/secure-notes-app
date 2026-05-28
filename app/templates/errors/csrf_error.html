@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}CSRF Error - Secure Notes{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+                <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> CSRF Token Error</h4>
+            </div>
+            <div class="card-body p-4">
+                <p>CSRF token validation failed. This could be due to:</p>
+                <ul>
+                    <li>Your session has expired</li>
+                    <li>You submitted the form from another tab or window</li>
+                    <li>You have cookies disabled in your browser</li>
+                </ul>
+                <p>Please <a href="{{ url_for('auth.login') }}" class="btn btn-primary mt-2">login again</a> and try again.</p>
+                <hr>
+                <button onclick="history.back()" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Go Back
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

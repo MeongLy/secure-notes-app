@@ -24,6 +24,9 @@
             </div>
             <div class="card-body p-4">
                 <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm">
+                    <!-- ✅ CSRF TOKEN - TAMBAHKAN BARIS INI -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                     <div class="mb-3">
                         <label for="username" class="form-label fw-semibold">
                             <i class="fas fa-user me-1 text-success"></i> Username
@@ -87,7 +90,7 @@
             <div class="card-footer bg-light text-center py-3">
                 <small>Sudah punya akun? <a href="{{ url_for('auth.login') }}" class="text-success fw-bold">Login di sini</a></small><br>
                 <small class="text-muted">
-                    <i class="fas fa-shield-alt me-1"></i> Proteksi: bcrypt hashing | Input Validation | Sanitasi
+                    <i class="fas fa-shield-alt me-1"></i> Proteksi: bcrypt hashing | Input Validation | Sanitasi | CSRF Protection
                 </small>
             </div>
         </div>

@@ -12,6 +12,7 @@
             </div>
             <div class="card-body p-4">
                 <form method="POST" action="{{ url_for('notes.create_note') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="title" class="form-label fw-semibold">
                             <i class="fas fa-heading me-1 text-primary"></i> Judul
@@ -42,7 +43,6 @@
             </div>
         </div>
 
-        <!-- Tips Keamanan -->
         <div class="alert alert-info mt-3 small">
             <i class="fas fa-shield-alt me-2"></i>
             <strong>Tips Keamanan:</strong> Catatan Anda dienkripsi dan hanya bisa diakses oleh Anda. Admin tidak dapat membaca isi catatan pribadi Anda.
@@ -51,7 +51,6 @@
 </div>
 
 <script>
-    // Character counter for title
     const titleInput = document.getElementById('title');
     const titleHelp = titleInput?.parentElement?.querySelector('.form-text');
     if (titleInput && titleHelp) {

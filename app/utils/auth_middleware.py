@@ -146,8 +146,6 @@ def session_timeout_check(f):
         from flask import session
 
         if current_user.is_authenticated:
-            # Flask-Login handles session timeout via PERMANENT_SESSION_LIFETIME
-            # This is just an additional check
             if not session.get("_fresh", True):
                 flash("Sesi Anda telah berakhir. Silakan login kembali.", "warning")
                 return redirect(url_for("auth.logout"))
